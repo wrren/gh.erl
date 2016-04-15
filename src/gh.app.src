@@ -1,0 +1,18 @@
+{ application, gh,
+[
+    { description, "Erlang GitHub API Library" },
+    { vsn, "0.0.1" },
+    { modules, 
+    [
+        gh,
+        gh_pagination,
+        gh_request
+    ] },
+    { registered, [] },
+    { applications, 
+    [
+        kernel,
+        stdlib
+    ] },
+    { env, [] }
+] }.

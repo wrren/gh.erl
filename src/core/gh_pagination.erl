@@ -10,10 +10,16 @@
 -define( LINK_SEPARATOR,	"," ).
 %% Separates the URL from the link type in a single link
 -define( URL_REL_SEPARATOR, ";" ).
-%% Characters surrounding the URL
--define( URL_BOUNDARY_CHARS, 	"<>" ).
-%% Character surrounding the rel element
--define( REL_BOUNDARY_CHAR, 	"\"" ).
+%% URL Component Regex
+-define( URL_CAPTURE_REGEX, "<(.+)>" ).
+%% Rel Component Regex
+-define( REL_CAPTURE_REGEX, "rel=\"([a-z]+)\"" ).
+%% For query parameters, the character separating key-value pairs from eachother
+-define( PARAM_SEPARATOR, 		"&" ).
+%% For single query parameters, the character separating keys from values
+-define( KEY_VALUE_SEPARATOR,	"=" ).
+%% Page number query parameter key
+-define( PAGE_KEY,				"page" ).
 
 %%	Link descriptor/url pair
 -type link() 		:: { atom(), string() }.
@@ -34,17 +40,32 @@ rel( "first", Url, Out )	-> [{ first, Url } | Out];
 rel( _, _, Out )			-> Out.
 
 %%
+%%	Given a URL that points to one page in a paginated result set, parse the page number from the URL
+%%
+-spec page_number( string() ) -> undefined | pos_integer().
+page_number( [ [ ?PAGE_KEY, Value ] | T ] ) ->
+	case string:to_integer( Value ) of
+		{ error, _Reason }		-> undefined;
+		{ PageNumber, _Rest }	-> PageNumber
+	end;
+
+page_number( [ Tokens | T ] ) when is_list( Tokens ) ->
+	page_number( T );
+	
+page_number( [] ) -> undefined;
+
+page_number( Url ) ->
+	page_number( [ string:tokens( X, ?KEY_VALUE_SEPARATOR ) || X <- string:tokens( Url, ?PARAM_SEPARATOR ) ] ).
+
+%%
 %%	Extract the Link header and produce a proplist of provided links
 %%
--spec links( headers(), [link()] ) -> [link()]
+-spec links( headers(), [link()] ) -> [link()].
 links( [H | T], Out ) ->
-	case string:tokens( H, ?URL_REL_SEPARATOR ) of
-		[ UrlEncoded, RelEncoded ] 	-> 
-			[ Url ]		= string:tokens( UrlEncoded, ?URL_BOUNDARY_CHARS ),
-			[ _, Rel ]	= string:tokens( RelEncoded, ?REL_BOUNDARY_CHAR ),
-			links( T, rel( Rel, Url, Out ) );
-		
-		_ 							-> links( T, Out )
+	case { 	re:run( H, ?URL_CAPTURE_REGEX, [{ capture, all_but_first, list}] ),
+			re:run( H, ?REL_CAPTURE_REGEX, [{ capture, all_but_first, list}] ) } of
+		{ { match, [ Url ] }, { match, [ Rel ] } }	-> links( T, rel( Rel, Url, Out ) );
+		_ 											-> links( T, Out )
 	end;
 	
 links( [], Out ) -> Out.
@@ -73,6 +94,6 @@ next_page( Headers ) ->
 -spec page_count( headers() ) -> pos_integer() | undefined.
 page_count( Headers ) ->
 	case lists:keyfind( last, 1, links( Headers ) ) of
-		{ last, Url }	-> Url;
+		{ last, Url }	-> page_number( Url );
 		_ 				-> undefined
 	end.
