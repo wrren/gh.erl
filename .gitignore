@@ -10,3 +10,4 @@ rel/example_project
 .rebar
 logs/
 .vscode/
+test/test.config

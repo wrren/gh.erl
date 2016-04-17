@@ -1,24 +1,44 @@
 -module( gh ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [init/1, init/2] ).
+-export( [init/0, init/1, init/2, request_module/2] ).
 -include_lib( "gh.hrl" ).
 
--define( GITHUB_API_URL, "https://api.github.com" ).
+-type auth() :: atom() | { atom(), string() } | { atom(), string(), string() }.
+-export_type( [auth/0] ).
+
+%%
+%%  Initialize gh without an authentication token. Errors will occur if an attempt is made
+%%  to access endpoints that require authentication.
+%%
+-spec init() -> #gh_state{}.
+init() ->
+	init( anonymous, ?GITHUB_API_URL ).
 
 %%
 %%  Initialize gh with the given authentication parameters
 %%
 -spec init( { atom(), string() } ) -> #gh_state{}.
 init( Auth ) ->
-    init( Auth, ?GITHUB_API_URL ).
+	init( Auth, ?GITHUB_API_URL ).
 
 %%
 %%  Initialize gh with the given authentication parameters and API base URL
 %%
 -spec init( { atom(), string() }, string() ) -> #gh_state{}.
+init( Auth =  anonymous, BaseUrl ) ->
+	#gh_state{ base_url = BaseUrl, auth = Auth };
+
 init( Auth =  { oauth, _Token }, BaseUrl ) ->
-    #gh_state{ base_url = BaseUrl, auth = Auth };
+	#gh_state{ base_url = BaseUrl, auth = Auth };
 
 init( Auth =  { basic, _Username, _Password }, BaseUrl ) ->
-    #gh_state{ base_url = BaseUrl, auth = Auth }.
+	#gh_state{ base_url = BaseUrl, auth = Auth }.
+	
+%%
+%%	Override the request module used to communicate with the github API. Primarily used for
+%%	testing purposes.
+%%
+-spec request_module( module(), #gh_state{} ) -> #gh_state{}.
+request_module( Module, State = #gh_state{} ) ->
+	State#gh_state{ request = Module }.

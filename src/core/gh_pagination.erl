@@ -43,7 +43,7 @@ rel( _, _, Out )			-> Out.
 %%	Given a URL that points to one page in a paginated result set, parse the page number from the URL
 %%
 -spec page_number( string() ) -> undefined | pos_integer().
-page_number( [ [ ?PAGE_KEY, Value ] | T ] ) ->
+page_number( [ [ ?PAGE_KEY, Value ] | _T ] ) ->
 	case string:to_integer( Value ) of
 		{ error, _Reason }		-> undefined;
 		{ PageNumber, _Rest }	-> PageNumber

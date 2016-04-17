@@ -1,0 +1,2 @@
+{ gh_user, "github_user_name" }.
+{ gh_oauth_token, "oauth_token" }.

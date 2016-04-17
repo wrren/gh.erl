@@ -4,7 +4,7 @@
 -export( [list/1] ).
 
 list( State ) ->
-    case gh_request:get( "user/repos", State ) of
-        { ok, JSON }             ->  { ok, JSON };
-        { error, Reason, Url }   ->  { error, Reason, Url }
+    case gh_request:get( [ "user", "repos" ], State ) of
+        { ok, JSON }        ->  { ok, JSON };
+        { error, Reason }   ->  { error, Reason }
     end.

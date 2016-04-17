@@ -1,9 +1,7 @@
--module( gh_request ).
+-module( gh_httpc_request ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [get/3, get/2] ).
-
--include_lib( "gh.hrl" ).
+-export( [request/7] ).
 
 -define( ACCESS_TOKEN_KEY, 		"access_token" ).
 -define( PAGE_KEY,				"page" ).
@@ -11,26 +9,27 @@
 -define( ACCEPT_JSON,			{ "Accept", "application/json" } ).
 
 -type request() :: httpc:request().
+-type param() 	:: { string(), string() }.
+-type params()	:: [param()].
 
 %%
 %%	Generate an authentication header for inclusion in a request based on the authentication method
 %%	chosen during the gh:init phase
 %%
--spec auth( { atom(), string() } | { atom(), string(), string() } ) -> { string(), string() }.
-auth( { oauth, Token } ) ->
-	{ "Authorization", string:concat( "token ", Token ) };
+-spec auth( atom() | { atom(), string() } | { atom(), string(), string() }, [{string(), string()}] ) -> { string(), string() }.
+auth( anonymous, Headers ) -> 
+	Headers;
+
+auth( { oauth, Token }, Headers ) ->
+	[{ "Authorization", string:concat( "token ", Token ) } | Headers];
 	
-auth( { basic, Username, Password } ) ->
+auth( { basic, Username, Password }, Headers ) ->
 	BasicAuth = base64:encode_to_string( lists:append( [ binary_to_list( Username ), ":", binary_to_list( Password ) ] ) ),
-	{ "Authorization", string:concat( "Basic ", BasicAuth ) }.
+	[{ "Authorization", string:concat( "Basic ", BasicAuth ) } | Headers].
 
 %%
 %%	Generate a URL by joining a base URL with the provided path and query parameters
 %%
--spec url( binary() | list(), binary() | list() ) -> binary().
-url( Url, Path ) ->
-	url( Url, Path, [] ).
-
 -spec url( binary() | list(), binary() | list(), [{ list() | binary(), list() | binary() }] ) -> binary().
 url( Url, Path, QueryParams ) when is_list( Url ) ->
 	case lists:last( Url ) of
@@ -65,30 +64,26 @@ request( Method, Request, Url, Data ) ->
 			end;			
 		%% Some other status code
 		{ ok, { { _Version, _, Reason }, _Headers, _Body } } ->
-			{ error, Reason, Url };
+			{ error, Reason };
 		%% Request failed
 		{ error, Reason } -> 
-			{ error, Reason, Url }
+			{ error, Reason }
 	end.
 
+-spec request( atom(), request(), string() ) -> { ok, term() } | { error, term() }.
 request( Method, Request, Url ) ->
 	request( Method, Request, Url, [] ).
 
-request( BaseUrl, Endpoint, Params, Method, Body, ContentType, Auth ) when Method =:= post orelse Method =:= put ->
-	Url = url( BaseUrl, [ Endpoint ], Params ),
-	request( Method, { Url, [?ACCEPT_JSON, ?EGITHUB_USER_AGENT, auth( Auth )], ContentType, Body }, Url ).
+-spec request( string(), [string()], params(), atom(), term(), string(), gh:auth() ) -> { ok, term() } | { error, term() }.
+request( BaseUrl, Endpoint, Params, Method, Body, ContentType, Auth ) when 		Method =:= post 	orelse 
+																				Method =:= put 		orelse 
+																				Method =:= patch ->
+	Url = url( BaseUrl, Endpoint, Params ),
+	request( Method, { Url, auth( Auth, [?ACCEPT_JSON, ?EGITHUB_USER_AGENT] ), ContentType, Body }, Url );
 
-request( BaseUrl, Endpoint, Params, get, Auth ) ->
-	Url = url( BaseUrl, [ Endpoint ], Params ),
-	request( get, { Url, [?ACCEPT_JSON, ?EGITHUB_USER_AGENT, auth( Auth )] }, Url ).
-
-%%
-%%	Perform an authenticated GET request against the specified API endpoint with the given query parameters.
-%%
--spec get( string(), [ { string(), string() } ], #gh_state{} ) -> { error, term() } | { ok, map() }.
-get( Endpoint, Params, #gh_state{ base_url = BaseUrl, auth = Auth } ) ->
-	request( BaseUrl, Endpoint, Params, get, Auth ).
-
--spec get( string(), #gh_state{} ) -> { error, term() } | { ok, map() }.
-get( Endpoint, #gh_state{ base_url = BaseUrl, auth = Auth } ) ->
-	request( BaseUrl, Endpoint, [], get, Auth ).
+request( BaseUrl, Endpoint, Params, Method, _Body, _ContentType, Auth ) when 	Method =:= get 		orelse 
+																				Method =:= delete 	orelse 
+																				Method =:= head 	orelse 
+																				Method =:= options ->
+	Url = url( BaseUrl, Endpoint, Params ),
+	request( Method, { Url, auth( Auth, [?ACCEPT_JSON, ?EGITHUB_USER_AGENT] ) }, Url ).
