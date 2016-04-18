@@ -17,11 +17,11 @@ init_per_suite( Config ) ->
 repo_request( _Config ) ->
 	Token = ct:get_config( gh_oauth_token ),
 	State = gh:init( { oauth, Token } ),
-	{ ok, JSON } = gh_repo:list( State ),
-	length( JSON ) > 0,
-	[ First | _Rest ] = JSON,
-	byte_size( gh_repo:name( First ) ) > 0.
-	
+	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
+	true = maps:is_key( name, Repository ),
+	{ ok, [ Branch | _ ] }	 	= gh_repo:branches( Repository, State ),
+	true = maps:is_key( name, Branch ).
+		
 end_per_suite( Config ) ->
 	application:stop( ssl ),
 	application:stop( public_key ),
