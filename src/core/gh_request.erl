@@ -5,6 +5,12 @@
 
 -include_lib( "gh.hrl" ).
 
+%%
+%%	Types into which JSON may be decoded
+%%
+-type json() :: [map()] | map().
+
+-export_type( [json/0] ).
 
 %%
 %%	Perform an authenticated GET request against the specified API endpoint with the given query parameters.

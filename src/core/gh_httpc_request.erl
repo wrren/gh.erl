@@ -57,10 +57,10 @@ request( Method, Request, Url, Data ) ->
 			case gh_pagination:next_page( Headers ) of
 				%% No pages left to retrieve
 				undefined ->
-					{ ok, [ JSONResponse | Data ] };
+					{ ok, lists:append( Data, JSONResponse ) };
 				%% There are still pages left to retrieve
 				NextUrl ->
-					request( Method, Request, NextUrl, [ JSONResponse | Data ] )
+					request( Method, Request, NextUrl, lists:append( Data, JSONResponse ) )
 			end;			
 		%% Some other status code
 		{ ok, { { _Version, _, Reason }, _Headers, _Body } } ->

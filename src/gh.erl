@@ -4,8 +4,9 @@
 -export( [init/0, init/1, init/2, request_module/2] ).
 -include_lib( "gh.hrl" ).
 
--type auth() :: atom() | { atom(), string() } | { atom(), string(), string() }.
--export_type( [auth/0] ).
+-type auth() 	:: atom() | { atom(), string() } | { atom(), string(), string() }.
+-type state() 	:: #gh_state{}.
+-export_type( [state/0, auth/0] ).
 
 %%
 %%  Initialize gh without an authentication token. Errors will occur if an attempt is made
