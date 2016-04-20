@@ -1,7 +1,7 @@
 -module( gh_repo ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [list/1] ).
+-export( [list/1, by_name/3] ).
 -export( [id/1, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
 
 -type repository()  :: map().
@@ -12,10 +12,17 @@
 %%
 %%  List all repositories accessible to the authenticated user.
 %%
--spec list( gh:state() ) -> { ok, gh_request:json() } | { error, term() }.
+-spec list( gh:state() ) -> { ok, [repository()] } | { error, term() }.
 list( State ) ->
     gh_request:get( ["user", "repos"], State ).
-   
+
+%%
+%%  Given an owner name and a repository name, get information on the repository
+%%
+-spec by_name( string(), string(), gh:state() ) -> { ok, repository() } | { error, term() }.
+by_name( Owner, Name, State ) ->
+    gh_request:get( ["repos", Owner, Name], State ).
+
 %% Repository ID
 id( #{ id := ID } )                         -> ID.
 %% Repository Owner Name
