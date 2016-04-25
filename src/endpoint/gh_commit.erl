@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 %% Query Functions
--export( [list/2, by_sha/3, sha/1] ).
+-export( [make/1, list/2, by_sha/3, sha/1] ).
 
 %% Type Exports
 -type commit() 		:: map().
@@ -27,3 +27,12 @@ by_sha( Repository, Sha, State ) ->
 %%	Get the SHA1 hash of this commit
 %%
 sha( #{ sha := Sha } ) -> Sha.
+
+
+%%
+%%  Generate a map with a format matching that of a decoded commit JSON blob, useful for testing
+%%  without knowledge of map internals.
+%%
+-spec make( sha() ) -> commit().
+make( SHA ) ->
+    #{ sha => SHA }.

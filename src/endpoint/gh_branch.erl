@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 %% Query Functions
--export( [list/2] ).
+-export( [list/2, make/3] ).
 %% Accessors
 -export( [name/1, commit_sha/1, commit_url/1] ).
 
@@ -23,3 +23,12 @@ name( #{ name := Name } )						-> Name.
 commit_sha( #{ commit := #{ sha := Sha } } )	-> Sha.
 %% Get a link to detailes on the latest commit
 commit_url( #{ commit := #{ url := Url } } )	-> Url.
+
+%%
+%%  Generate a map with a format matching that of a decoded branch JSON blob, useful for testing
+%%  without knowledge of map internals.
+%%
+-spec make( binary(), binary(), binary() ) -> branch().
+make( Name, CommitSHA, CommitURL ) ->
+    #{  name 		=> Name,
+		commit 		=> #{ sha => CommitSHA, url => CommitURL } }.

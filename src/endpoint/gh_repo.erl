@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 -export( [list/1, by_name/3] ).
--export( [id/1, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
+-export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
 
 -type repository()  :: map().
 -type branch()      :: map().
@@ -39,3 +39,17 @@ clone_url( #{ clone_url := CloneUrl } )     -> CloneUrl.
 private( #{ private := "true" } )           -> true;
 private( #{ private := "false" } )          -> false;
 private( #{ private := Private } )          -> Private.
+
+%%
+%%  Generate a map with a format matching that of a decoded repository JSON blob, useful for testing
+%%  without knowledge of map internals.
+%%
+-spec make( pos_integer(), binary(), binary(), binary(), binary(), binary(), boolean() ) -> repository().
+make( ID, Owner, Name, GitUrl, SSHUrl, CloneUrl, Private ) ->
+    #{  id          => ID,
+        owner       => #{ login => Owner },
+        name        => Name,
+        git_url     => GitUrl,
+        ssh_url     => SSHUrl,
+        clone_url   => CloneUrl,
+        private     => Private }.
