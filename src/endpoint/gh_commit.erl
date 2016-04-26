@@ -6,7 +6,7 @@
 
 %% Type Exports
 -type commit() 		:: map().
--type sha()			:: string().
+-type sha()			:: binary().
 -export_type( [commit/0, sha/0] ).
 
 %%
