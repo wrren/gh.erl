@@ -1,2 +1,3 @@
-{ gh_user, "github_user_name" }.
-{ gh_oauth_token, "oauth_token" }.
+{ gh_user, 			"github_user_name" }.
+{ gh_repo,			"github_repository_name" }.
+{ gh_oauth_token,	"oauth_token" }.

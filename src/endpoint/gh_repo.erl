@@ -4,10 +4,12 @@
 -export( [list/1, by_name/3] ).
 -export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
 
+-type owner()       :: binary().
+-type name()        :: binary().
 -type repository()  :: map().
 -type branch()      :: map().
 
--export_type( [repository/0, branch/0] ).
+-export_type( [owner/0, name/0, repository/0, branch/0] ).
 
 %%
 %%  List all repositories accessible to the authenticated user.

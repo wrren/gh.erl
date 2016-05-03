@@ -1,7 +1,7 @@
 -module( gh_request ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [get/3, get/2, post/3, post/4] ).
+-export( [get/3, get/2, delete/2, delete/3, post/3, post/4] ).
 
 -include_lib( "gh.hrl" ).
 
@@ -22,6 +22,17 @@ get( Endpoint, Params, #gh_state{ base_url = BaseUrl, auth = Auth, request = Mod
 -spec get( [string()], #gh_state{} ) -> { error, term() } | { ok, map() }.
 get( Endpoint, #gh_state{ base_url = BaseUrl, auth = Auth, request = Module } ) ->
 	Module:request( BaseUrl, Endpoint, [], get, undefined, undefined, Auth ).
+	
+%%
+%%	Perform an authenticated DELETE request against the specified API endpoint with the given query parameters.
+%%
+-spec delete( [string()], [ { string(), string() } ], #gh_state{} ) -> { error, term() } | { ok, map() }.
+delete( Endpoint, Params, #gh_state{ base_url = BaseUrl, auth = Auth, request = Module } ) ->
+	Module:request( BaseUrl, Endpoint, Params, delete, undefined, undefined, Auth ).
+
+-spec delete( [string()], #gh_state{} ) -> { error, term() } | { ok, map() }.
+delete( Endpoint, #gh_state{ base_url = BaseUrl, auth = Auth, request = Module } ) ->
+	Module:request( BaseUrl, Endpoint, [], delete, undefined, undefined, Auth ).
 
 %%
 %%	Perform a POST request to the specified API endpoint with the given query parameters and data.
