@@ -1,6 +1,8 @@
 -module( gh_hook_SUITE ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
+-include_lib( "common_test/include/ct.hrl" ).
+
 -define( TEST_HOOK_NAME, 	<<"web">> ).
 -define( TEST_HOOK_URL,		<<"gh.me/hook">> ).
 -define( TEST_HOOK_EVENTS,	[<<"push">>] ).
@@ -20,7 +22,7 @@ init_per_suite( Config ) ->
 	ok = application:start( ssl ),
 	Config.
 	
-create_test( _Config ) ->
+create_test( Config ) ->
 	Token 	= ct:get_config( gh_oauth_token ),
 	Repo 	= ct:get_config( gh_repo ),
 	Owner 	= ct:get_config( gh_user ),
@@ -30,17 +32,20 @@ create_test( _Config ) ->
 	true = maps:is_key( ping_url, Hook ),
 	
 	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
-	length( lists:filter( fun( #{ name := Name } ) -> binary_to_list( Name ) == ?TEST_HOOK_NAME end, Hooks ) ) == 1.
+	length( lists:filter( fun( #{ name := Name } ) -> binary_to_list( Name ) == ?TEST_HOOK_NAME end, Hooks ) ) == 1,
+	{ save_config, [{ hook_id, gh_hook:id( Hook ) }] }.
 		
-delete_test( _Config ) ->
+delete_test( Config ) ->
+	{ create_test, HookConfig }	= ?config( saved_config, Config ),
+	ID 							= ?config( hook_id, HookConfig ),
+	
 	Token 	= ct:get_config( gh_oauth_token ),
 	Repo 	= ct:get_config( gh_repo ),
 	Owner 	= ct:get_config( gh_user ),
 	State 	= gh:init( { oauth, Token } ),
 	
-	ok = gh_hook:delete( Owner, Repo, ?TEST_HOOK_NAME, State ),
-	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
-	length( lists:filter( fun( #{ name := Name } ) -> binary_to_list( Name ) == ?TEST_HOOK_NAME end, Hooks ) ) == 0.
+	ok 				= gh_hook:delete( Owner, Repo, ID, State ),
+	{ error, _ }	= gh_hook:by_id( Owner, Repo, ID, State ).
 		
 end_per_suite( Config ) ->
 	application:stop( ssl ),

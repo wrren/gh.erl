@@ -4,6 +4,8 @@
 %% Queries
 -export( [	list/2, list/3, 
 			by_id/3, by_id/4, 
+			by_name/3, by_name/4,
+			by_url/3, by_url/4,
 			create/7, create/8, 
 			delete/3, delete/4] ).
 %% Accessors
@@ -56,6 +58,47 @@ by_id( Repository, ID, State ) ->
 	
 
 %%
+%%	Find all hooks with the given name in the specified repository
+%%
+-spec by_name( gh_repo:owner(), gh_repo:name(), name(), gh:state() ) -> { ok, [hook()] } | { error, term() }.
+by_name( Owner, Repo, HookName, State ) ->
+	case list( Owner, Repo, State ) of
+		{ ok, Hooks } -> 
+			HName = gh_want:binary( HookName ),
+			{ ok, lists:filter( fun( #{ name := Name } ) -> Name == HName end, Hooks ) };
+		
+		{ error, Reason } -> 
+			{ error, Reason }
+	end.
+
+-spec by_name( gh:repository(), name(), gh:state() ) -> { ok, [hook()] } | { error, term() }.
+by_name( Repo, HookName, State ) ->
+	by_name( gh_repo:owner( Repo ), gh_repo:name( Repo ), HookName, State ).	
+
+
+%%
+%%	Find the hook with the given URL in the specified repository
+%%
+-spec by_url( gh_repo:owner(), gh_repo:name(), binary(), gh:state() ) -> { ok, hook() } | { error, term() }.
+by_url( Owner, Repo, URL, State ) ->
+	case list( Owner, Repo, State ) of
+		{ ok, Hooks } -> 
+			UB = gh_want:binary( URL ),
+			case lists:filter( fun( #{ config := #{ url := U } } ) -> U == UB end, Hooks ) of
+				[Hook]	-> { ok, Hook };
+				[] 		-> { error, not_found };
+				Hooks 	-> { ok, Hooks }
+			end;
+		
+		{ error, Reason } -> 
+			{ error, Reason }
+	end.
+
+-spec by_url( gh:repository(), binary(), gh:state() ) -> { ok, hook() } | { error, term() }.
+by_url( Repo, URL, State ) ->
+	by_url( gh_repo:owner( Repo ), gh_repo:name( Repo ), URL, State ).
+	
+%%
 %%	Create a hook under the given repository
 %%
 -spec create( gh_repo:owner(), gh_repo:name(), name(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
@@ -66,7 +109,12 @@ create( Owner, Repo, HookName, URL, ContentType, Events, Active, State ) ->
 					content_type 	=> gh_want:binary( ContentType ) }, 
 				events => [ gh_want:binary( E ) || E <- Events ], 
 				active => gh_want:boolean( Active ) },
-	gh_request:post( ["repos", Owner, Repo, "hooks" ], JSON, State ).
+	case gh_request:post( ["repos", Owner, Repo, "hooks" ], JSON, State ) of
+		{ ok, Hook }				-> { ok, Hook };
+		{ error, { 422, _, _ } }	-> by_url( Owner, Repo, URL, State );
+		{ error, { _, Reason, _ } }	-> { error, Reason };
+		{ error, Reason }			-> { error, Reason }
+	end.
 	
 -spec create( gh:repository(), name(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
 create( Repository, HookName, URL, ContentType, Events, Active, State ) ->
@@ -77,7 +125,7 @@ create( Repository, HookName, URL, ContentType, Events, Active, State ) ->
 %%
 -spec delete( gh_repo:owner(), gh_repo:name(), id(), gh:state() ) -> ok | { error, term() }.
 delete( Owner, Repo, ID, State ) ->
-	case gh_request:delete( [ "repos", Owner, Repo, "hooks", ID ], State ) of
+	case gh_request:delete( [ "repos", Owner, Repo, "hooks", gh_want:string( ID ) ], State ) of
 		{ ok, _ }			-> ok;
 		{ error, Reason }	-> { error, Reason }
 	end.

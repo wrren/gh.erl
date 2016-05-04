@@ -52,7 +52,11 @@ url( Url, Path, QueryParams ) ->
 -spec request( atom(), request(), string(), [ term() ] ) -> { ok, term() } | { error, term() }.
 request( Method, Request, Url, Data ) ->
 	case httpc:request( Method, setelement( 1, Request, Url ), [], [{ body_format, binary }] ) of
-		{ ok, { { _Version, Status, _Reason}, Headers, Body } } when Status >= 200 andalso Status < 300 ->
+		%% Request completed with no content returned
+		{ ok, { { _Version, 204, _Reason }, _Headers, _Body } } ->
+			{ ok, no_content };
+		
+		{ ok, { { _Version, Status, _Reason }, Headers, Body } } when Status >= 200 andalso Status < 300 ->
 			JSONResponse = jsx:decode( Body, [ { labels, atom }, return_maps ] ),
 			case gh_pagination:next_page( Headers ) of
 				%% No pages left to retrieve
@@ -63,8 +67,8 @@ request( Method, Request, Url, Data ) ->
 					request( Method, Request, NextUrl, lists:append( Data, JSONResponse ) )
 			end;			
 		%% Some other status code
-		{ ok, { { _Version, _, Reason }, _Headers, Body } } ->
-			{ error, { Reason, Body } };
+		{ ok, { { _Version, Status, Reason }, _Headers, Body } } ->
+			{ error, { Status, Reason, Body } };
 		%% Request failed
 		{ error, Reason } -> 
 			{ error, Reason }
