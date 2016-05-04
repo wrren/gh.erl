@@ -10,7 +10,8 @@
 -type branch() 		:: gh_branch:branch().
 -type commit() 		:: gh_commit:commit().
 -type commit_sha() 	:: gh_commit:sha().
--export_type( [state/0, auth/0, repository/0, branch/0, commit/0, commit_sha/0] ).
+-type hook()		:: gh_hook:hook().
+-export_type( [state/0, auth/0, repository/0, branch/0, commit/0, commit_sha/0, hook/0] ).
 
 %%
 %%  Initialize gh without an authentication token. Errors will occur if an attempt is made
