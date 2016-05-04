@@ -3,7 +3,6 @@
 
 -include_lib( "common_test/include/ct.hrl" ).
 
--define( TEST_HOOK_NAME, 	<<"web">> ).
 -define( TEST_HOOK_URL,		<<"gh.me/hook">> ).
 -define( TEST_HOOK_EVENTS,	[<<"push">>] ).
 
@@ -28,11 +27,11 @@ create_test( Config ) ->
 	Owner 	= ct:get_config( gh_user ),
 	State 	= gh:init( { oauth, Token } ),
 	
-	{ ok, Hook }	= gh_hook:create( Owner, Repo, ?TEST_HOOK_NAME, ?TEST_HOOK_URL, <<"json">>, ?TEST_HOOK_EVENTS, true, State ),
+	{ ok, Hook }	= gh_hook:create_web( Owner, Repo, ?TEST_HOOK_URL, <<"json">>, ?TEST_HOOK_EVENTS, true, State ),
 	true = maps:is_key( ping_url, Hook ),
 	
 	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
-	length( lists:filter( fun( #{ name := Name } ) -> binary_to_list( Name ) == ?TEST_HOOK_NAME end, Hooks ) ) == 1,
+	length( lists:filter( fun( H ) -> gh_hook:config_url( H ) == ?TEST_HOOK_URL end, Hooks ) ) == 1,
 	{ save_config, [{ hook_id, gh_hook:id( Hook ) }] }.
 		
 delete_test( Config ) ->

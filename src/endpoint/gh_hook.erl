@@ -1,15 +1,18 @@
 -module( gh_hook ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
+-define( WEB_HOOK_NAME, <<"web">> ).
+
 %% Queries
 -export( [	list/2, list/3, 
 			by_id/3, by_id/4, 
 			by_name/3, by_name/4,
 			by_url/3, by_url/4,
+			create_web/6, create_web/7, 
 			create/7, create/8, 
 			delete/3, delete/4] ).
 %% Accessors
--export( [ 	id/1, url/1, test_url/1, ping_url/1, name/1, events/1, active/1, config/1, 
+-export( [ 	id/1, url/1, config_url/1, test_url/1, ping_url/1, name/1, events/1, active/1, config/1, 
 			updated_at/1, created_at/1] ).
 
 -type id() 		:: binary() | pos_integer().
@@ -19,16 +22,17 @@
 -export_type( [id/0, hook/0, name/0, event/0] ).
 
 %% Accessors
-id( #{ id := ID } )					-> ID.
-url( #{ url := URL } )				-> URL.
-name( #{ name := Name } )			-> Name.
-events( #{ events := Events } )		-> Events.
-active( #{ active := Active } )		-> Active.
-config( #{ config := Config } )		-> Config.
-test_url( #{ test_url := URL } )	-> URL.
-ping_url( #{ ping_url := URL } )	-> URL.
-updated_at( #{ updated_at := D } )	-> D.
-created_at( #{ created_at := D } )	-> D.
+id( #{ id := ID } )								-> ID.
+url( #{ url := URL } )							-> URL.
+config_url( #{ config := #{ url := URL } } )	-> URL.
+name( #{ name := Name } )						-> Name.
+events( #{ events := Events } )					-> Events.
+active( #{ active := Active } )					-> Active.
+config( #{ config := Config } )					-> Config.
+test_url( #{ test_url := URL } )				-> URL.
+ping_url( #{ ping_url := URL } )				-> URL.
+updated_at( #{ updated_at := D } )				-> D.
+created_at( #{ created_at := D } )				-> D.
 
 %%
 %%	List all hooks installed under the given repository
@@ -97,7 +101,7 @@ by_url( Owner, Repo, URL, State ) ->
 -spec by_url( gh:repository(), binary(), gh:state() ) -> { ok, hook() } | { error, term() }.
 by_url( Repo, URL, State ) ->
 	by_url( gh_repo:owner( Repo ), gh_repo:name( Repo ), URL, State ).
-	
+
 %%
 %%	Create a hook under the given repository
 %%
@@ -119,6 +123,18 @@ create( Owner, Repo, HookName, URL, ContentType, Events, Active, State ) ->
 -spec create( gh:repository(), name(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
 create( Repository, HookName, URL, ContentType, Events, Active, State ) ->
 	create( gh_repo:owner( Repository ), gh_repo:name( Repository ), HookName, URL, ContentType, Events, Active, State ).
+	
+%%
+%%	Create a webhook under the given repository
+%%
+-spec create_web( gh_repo:owner(), gh_repo:name(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
+create_web( Owner, Repo, URL, ContentType, Events, Active, State ) ->
+	create( Owner, Repo, ?WEB_HOOK_NAME, URL, ContentType, Events, Active, State ).
+	
+-spec create_web( gh:repository(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
+create_web( Repository, URL, ContentType, Events, Active, State ) ->
+	create_web( gh_repo:owner( Repository ), gh_repo:name( Repository ), URL, ContentType, Events, Active, State ).
+
 
 %%
 %%	Delete the hook with the given ID from the repository
