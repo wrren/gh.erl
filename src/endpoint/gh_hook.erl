@@ -12,7 +12,7 @@
 			create/7, create/8, 
 			delete/3, delete/4] ).
 %% Accessors
--export( [ 	id/1, url/1, config_url/1, test_url/1, ping_url/1, name/1, events/1, active/1, config/1, 
+-export( [ 	id/1, url/1, config_url/1, content_type/1, test_url/1, ping_url/1, name/1, events/1, active/1, config/1, 
 			updated_at/1, created_at/1] ).
 
 -type id() 		:: binary() | pos_integer().
@@ -22,17 +22,18 @@
 -export_type( [id/0, hook/0, name/0, event/0] ).
 
 %% Accessors
-id( #{ id := ID } )								-> ID.
-url( #{ url := URL } )							-> URL.
-config_url( #{ config := #{ url := URL } } )	-> URL.
-name( #{ name := Name } )						-> Name.
-events( #{ events := Events } )					-> Events.
-active( #{ active := Active } )					-> Active.
-config( #{ config := Config } )					-> Config.
-test_url( #{ test_url := URL } )				-> URL.
-ping_url( #{ ping_url := URL } )				-> URL.
-updated_at( #{ updated_at := D } )				-> D.
-created_at( #{ created_at := D } )				-> D.
+id( #{ id := ID } )										-> ID.
+url( #{ url := URL } )									-> URL.
+config_url( #{ config := #{ url := URL } } )			-> URL.
+content_type( #{ config := #{ content_type := C } } )	-> C.
+name( #{ name := Name } )								-> Name.
+events( #{ events := Events } )							-> Events.
+active( #{ active := Active } )							-> Active.
+config( #{ config := Config } )							-> Config.
+test_url( #{ test_url := URL } )						-> URL.
+ping_url( #{ ping_url := URL } )						-> URL.
+updated_at( #{ updated_at := D } )						-> D.
+created_at( #{ created_at := D } )						-> D.
 
 %%
 %%	List all hooks installed under the given repository
