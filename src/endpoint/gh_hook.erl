@@ -68,7 +68,7 @@ by_id( Repository, ID, State ) ->
 by_name( Owner, Repo, HookName, State ) ->
 	case list( Owner, Repo, State ) of
 		{ ok, Hooks } -> 
-			HName = gh_want:binary( HookName ),
+			HName = want:binary( HookName ),
 			{ ok, lists:filter( fun( #{ name := Name } ) -> Name == HName end, Hooks ) };
 		
 		{ error, Reason } -> 
@@ -87,7 +87,7 @@ by_name( Repo, HookName, State ) ->
 by_url( Owner, Repo, URL, State ) ->
 	case list( Owner, Repo, State ) of
 		{ ok, Hooks } -> 
-			UB = gh_want:binary( URL ),
+			UB = want:binary( URL ),
 			case lists:filter( fun( #{ config := #{ url := U } } ) -> U == UB end, Hooks ) of
 				[Hook]	-> { ok, Hook };
 				[] 		-> { error, not_found };
@@ -107,12 +107,12 @@ by_url( Repo, URL, State ) ->
 %%
 -spec create( gh_repo:owner(), gh_repo:name(), name(), binary(), binary(), [event()], boolean(), gh:state() ) -> { ok, hook() } | { error, term() }.
 create( Owner, Repo, HookName, URL, ContentType, Events, Active, State ) ->
-	JSON = #{ 	name => gh_want:binary( HookName ), 
+	JSON = #{ 	name => want:binary( HookName ), 
 				config => #{ 
-					url 			=> gh_want:binary( URL ), 
-					content_type 	=> gh_want:binary( ContentType ) }, 
-				events => [ gh_want:binary( E ) || E <- Events ], 
-				active => gh_want:boolean( Active ) },
+					url 			=> want:binary( URL ), 
+					content_type 	=> want:binary( ContentType ) }, 
+				events => [ want:binary( E ) || E <- Events ], 
+				active => want:boolean( Active ) },
 	case gh_request:post( ["repos", Owner, Repo, "hooks" ], JSON, State ) of
 		{ ok, Hook }				-> { ok, Hook };
 		{ error, { 422, _, _ } }	-> by_url( Owner, Repo, URL, State );
@@ -141,7 +141,7 @@ create_web( Repository, URL, ContentType, Events, Active, State ) ->
 %%
 -spec delete( gh_repo:owner(), gh_repo:name(), id(), gh:state() ) -> ok | { error, term() }.
 delete( Owner, Repo, ID, State ) ->
-	case gh_request:delete( [ "repos", Owner, Repo, "hooks", gh_want:string( ID ) ], State ) of
+	case gh_request:delete( [ "repos", Owner, Repo, "hooks", want:string( ID ) ], State ) of
 		{ ok, _ }			-> ok;
 		{ error, Reason }	-> { error, Reason }
 	end.
