@@ -4,7 +4,8 @@
 -define( WEB_HOOK_NAME, <<"web">> ).
 
 %% Queries
--export( [	list/2, list/3, 
+-export( [	make/5,
+			list/2, list/3, 
 			by_id/3, by_id/4, 
 			by_name/3, by_name/4,
 			by_url/3, by_url/4,
@@ -34,6 +35,10 @@ test_url( #{ test_url := URL } )						-> URL.
 ping_url( #{ ping_url := URL } )						-> URL.
 updated_at( #{ updated_at := D } )						-> D.
 created_at( #{ created_at := D } )						-> D.
+
+-spec make( id(), binary(), binary(), name(), [event()] ) -> hook().
+make( ID, URL, ContentType, Name, Events ) ->
+	#{ id => ID, name => Name, config => #{ url => URL, content_type => ContentType }, events => Events }.
 
 %%
 %%	List all hooks installed under the given repository
