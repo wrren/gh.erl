@@ -1,7 +1,7 @@
 -module( gh_repo ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [list/1, list/2, by_name/3] ).
+-export( [list/1, list/2, by_name/3, by_organization/2] ).
 -export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
 
 -type owner()       :: binary().
@@ -47,6 +47,13 @@ list( State, [], Params ) ->
 by_name( Owner, Name, State ) ->
     gh_request:get( ["repos", Owner, Name], State ).
 
+%%
+%%  List all repositories under the given organization
+%%
+-spec by_organization( string(), gh:state() ) -> { ok, [repository()] } | { error, term() }.
+by_organization( Organization, State ) ->
+    gh_request:get( ["orgs", Organization, "repos"], State ).
+   
 %% Repository ID
 id( #{ id := ID } )                         -> ID.
 %% Repository Owner Name
