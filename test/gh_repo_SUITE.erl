@@ -21,6 +21,9 @@ init_per_suite( Config ) ->
 	
 repo_list_test( Config ) ->
 	State = ?config( gh_state, Config ),
+	
+	{ ok, RepositoryList } = gh_repo:list( State, [{ affiliation, [ "owner" ] } ] ),
+	
 	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
 	true = maps:is_key( name, Repository ),
 	NewConfig	= [{ repository, Repository } | Config ],

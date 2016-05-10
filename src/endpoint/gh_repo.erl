@@ -1,7 +1,7 @@
 -module( gh_repo ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [list/1, by_name/3] ).
+-export( [list/1, list/2, by_name/3] ).
 -export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
 
 -type owner()       :: binary().
@@ -16,7 +16,29 @@
 %%
 -spec list( gh:state() ) -> { ok, [repository()] } | { error, term() }.
 list( State ) ->
-    gh_request:get( ["user", "repos"], State ).
+    list( State, [] ).
+
+-spec list( gh:state(), [{ atom(), string() }] ) -> { ok, [repository()] } | { error, term() }.
+list( State, Options ) ->
+    list( State, Options, [] ).
+
+list( State, [ { visibility, Visibility } | Rest ], Params ) ->
+    list( State, Rest, [ { "visibility", Visibility } | Params ] );
+    
+list( State, [ { affiliation, Affiliation } | Rest ], Params ) ->
+    list( State, Rest, [ { "affiliation", string:join( Affiliation, "," ) } | Params ] );
+    
+list( State, [ { type, Type } | Rest ], Params ) ->
+    list( State, Rest, [ { "type", Type } | Params ] );
+   
+list( State, [ { sort, Sort } | Rest ], Params ) ->
+    list( State, Rest, [ { "sort", Sort } | Params ] );
+   
+list( State, [ { direction, Direction } | Rest ], Params ) ->
+    list( State, Rest, [ { "direction", Direction } | Params ] );
+    
+list( State, [], Params ) ->
+    gh_request:get( ["user", "repos"], Params, State ).
 
 %%
 %%  Given an owner name and a repository name, get information on the repository
