@@ -37,6 +37,7 @@ repo_name_test( Config ) ->
 	Owner 			= gh_repo:owner( Repo ),
 	Name 			= gh_repo:name( Repo ),
 	{ ok, JSON }	= gh_repo:by_name( Owner, Name, State ),
+	Admin 			= gh_repo:admin( Repo ),
 	Name 			= gh_repo:name( JSON ).	
 		
 end_per_suite( Config ) ->

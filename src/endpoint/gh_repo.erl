@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 -export( [list/1, list/2, by_name/3, by_organization/2] ).
--export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1] ).
+-export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1, admin/1, push/1, pull/1] ).
 
 -type owner()       :: binary().
 -type name()        :: binary().
@@ -55,21 +55,27 @@ by_organization( Organization, State ) ->
     gh_request:get( ["orgs", Organization, "repos"], State ).
    
 %% Repository ID
-id( #{ id := ID } )                         -> ID.
+id( #{ id := ID } )                             -> ID.
 %% Repository Owner Name
-owner( #{ owner := #{ login := Owner } } )  -> Owner.
+owner( #{ owner := #{ login := Owner } } )      -> Owner.
 %% Repository descriptive name
-name( #{ name := Name } )                   -> Name.
+name( #{ name := Name } )                       -> Name.
 %% Get the git:// scheme URL for this repository
-git_url( #{ git_url := GitUrl } )           -> GitUrl.
+git_url( #{ git_url := GitUrl } )               -> GitUrl.
 %% Get the ssh:// scheme URL for this repository
-ssh_url( #{ ssh_url := SSHUrl } )           -> SSHUrl.
+ssh_url( #{ ssh_url := SSHUrl } )               -> SSHUrl.
 %% Get a URL suitable for passing to git clone 
-clone_url( #{ clone_url := CloneUrl } )     -> CloneUrl.
+clone_url( #{ clone_url := CloneUrl } )         -> CloneUrl.
 %% Check whether the repository is marked as private
-private( #{ private := "true" } )           -> true;
-private( #{ private := "false" } )          -> false;
-private( #{ private := Private } )          -> Private.
+private( #{ private := "true" } )               -> true;
+private( #{ private := "false" } )              -> false;
+private( #{ private := Private } )              -> Private.
+%% Check whether the authenticated user has admin permissions on the repository
+admin( #{ permissions := #{ admin := P } } )    -> want:boolean( P ).
+%% Check whether the authenticated user has push permissions on the repository
+push( #{ permissions := #{ push := P } } )      -> want:boolean( P ).
+%% Check whether the authenticated user has pull permissions on the repository
+pull( #{ permissions := #{ pull := P } } )      -> want:boolean( P ).
 
 %%
 %%  Generate a map with a format matching that of a decoded repository JSON blob, useful for testing
