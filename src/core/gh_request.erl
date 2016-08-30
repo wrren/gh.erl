@@ -3,7 +3,7 @@
 
 -export( [get/3, get/2, delete/2, delete/3, post/3, post/4] ).
 
--include_lib( "gh.hrl" ).
+-include_lib( "gh/include/gh.hrl" ).
 
 %%
 %%	Types into which JSON may be decoded
