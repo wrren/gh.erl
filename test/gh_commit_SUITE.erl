@@ -7,11 +7,11 @@ all() ->
 	[ commit_list_test ].
 	
 init_per_suite( Config ) ->
-	ok = application:start( inets ),
-	ok = application:start( asn1 ),
-	ok = application:start( crypto ),
-	ok = application:start( public_key ),
-	ok = application:start( ssl ),
+	application:start( inets ),
+	application:start( asn1 ),
+	application:start( crypto ),
+	application:start( public_key ),
+	application:start( ssl ),
 	Config.
 	
 commit_list_test( _Config ) ->

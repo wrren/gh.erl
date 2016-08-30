@@ -7,15 +7,14 @@ all() ->
 	[ feed_request ].
 	
 init_per_suite( Config ) ->
-	ok = application:start( inets ),
-	ok = application:start( asn1 ),
-	ok = application:start( crypto ),
-	ok = application:start( public_key ),
-	ok = application:start( ssl ),
+	application:start( inets ),
+	application:start( asn1 ),
+	application:start( crypto ),
+	application:start( public_key ),
+	application:start( ssl ),
 	Config.
 	
 feed_request( _Config ) ->
-	User = ct:get_config( gh_user ),
 	State = gh:init(),
 	{ ok, _JSON } = gh_request:get( [ "feeds" ], State ).
 	

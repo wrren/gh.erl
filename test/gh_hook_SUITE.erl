@@ -14,14 +14,14 @@ all() ->
 groups() -> [{ create_and_delete, [sequence], [create_test, delete_test] }].
 	
 init_per_suite( Config ) ->
-	ok = application:start( inets ),
-	ok = application:start( asn1 ),
-	ok = application:start( crypto ),
-	ok = application:start( public_key ),
-	ok = application:start( ssl ),
+	application:start( inets ),
+	application:start( asn1 ),
+	application:start( crypto ),
+	application:start( public_key ),
+	application:start( ssl ),
 	Config.
 	
-create_test( Config ) ->
+create_test( _Config ) ->
 	Token 	= ct:get_config( gh_oauth_token ),
 	Repo 	= ct:get_config( gh_repo ),
 	Owner 	= ct:get_config( gh_user ),
@@ -31,7 +31,7 @@ create_test( Config ) ->
 	true = maps:is_key( ping_url, Hook ),
 	
 	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
-	length( lists:filter( fun( H ) -> gh_hook:config_url( H ) == ?TEST_HOOK_URL end, Hooks ) ) == 1,
+	1 = length( lists:filter( fun( H ) -> gh_hook:config_url( H ) == ?TEST_HOOK_URL end, Hooks ) ),
 	{ save_config, [{ hook_id, gh_hook:id( Hook ) }] }.
 		
 delete_test( Config ) ->
