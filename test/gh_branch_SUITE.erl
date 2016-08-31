@@ -19,6 +19,7 @@ branch_list_test( _Config ) ->
 	State = gh:init( { oauth, Token } ),
 	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
 	{ ok, [ Branch | _ ] }	 	= gh_branch:list( Repository, State ),
+	{ ok, _ }					= gh_branch:list( ct:get_config( gh_user ), ct:get_config( gh_repo ), State ),
 	true = maps:is_key( name, Branch ).
 		
 end_per_suite( Config ) ->

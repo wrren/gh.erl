@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 %% Query Functions
--export( [list/2, make/3] ).
+-export( [list/2, list/3, make/3] ).
 %% Accessors
 -export( [name/1, commit_sha/1, commit_url/1] ).
 
@@ -11,12 +11,19 @@
 -export_type( [branch/0] ).
 
 %%
-%%	List all branches under the given repository
+%%	@doc List all branches under the given repository
 %%
 -spec list( gh_repo:repository(), gh:state() ) -> { ok, [ branch() ] } | { error, term() }.
 list( Repository, State ) ->
-	gh_request:get( ["repos", gh_repo:owner( Repository ), gh_repo:name( Repository ), "branches" ], State ).
-	
+	list( gh_repo:owner( Repository ), gh_repo:name( Repository ), State ).
+
+%%
+%%	@doc List all branches under the given repository
+%%	
+-spec list( gh_repo:owner(), gh_repo:name(), gh:state() ) -> { ok, [ branch() ] } | { error, term() }.
+list( Owner, Repository, State ) ->
+	gh_request:get( ["repos", Owner, Repository, "branches" ], State ).
+
 %% Get the branch name
 name( #{ name := Name } )						-> Name.
 %% Get the latest commit SHA1
