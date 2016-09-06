@@ -20,6 +20,7 @@ branch_list_test( _Config ) ->
 	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
 	{ ok, [ Branch | _ ] }	 	= gh_branch:list( Repository, State ),
 	{ ok, _ }					= gh_branch:list( ct:get_config( gh_user ), ct:get_config( gh_repo ), State ),
+	{ ok, _Branch }	 			= gh_branch:get( gh_repo:owner( Repository ), gh_repo:name( Repository ), gh_branch:name( Branch ), State ),
 	true = maps:is_key( name, Branch ).
 		
 end_per_suite( Config ) ->

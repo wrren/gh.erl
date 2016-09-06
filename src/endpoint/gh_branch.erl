@@ -2,13 +2,21 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 %% Query Functions
--export( [list/2, list/3, make/3] ).
+-export( [get/4, list/2, list/3, make/3] ).
 %% Accessors
 -export( [name/1, commit_sha/1, commit_url/1] ).
 
 %% Type Exports
--type branch() :: map().
--export_type( [branch/0] ).
+-type branch() 	:: map().
+-type name() 	:: binary().
+-export_type( [branch/0, name/0] ).
+
+%%
+%%	@doc Get a single branch by name from the given repository
+%%
+-spec get( gh_repo:owner(), gh_repo:name(), gh_branch:name(), gh:state() ) -> { ok, branch() } | { error, term() }.
+get( Owner, Repository, Branch, State ) ->
+	gh_request:get( ["repos", Owner, Repository, "branches", Branch ], State ).
 
 %%
 %%	@doc List all branches under the given repository
