@@ -27,7 +27,7 @@ create_test( _Config ) ->
 	Owner 	= ct:get_config( gh_user ),
 	State 	= gh:init( { oauth, Token } ),
 	
-	{ ok, Hook }	= gh_hook:create_web( Owner, Repo, ?TEST_HOOK_URL, <<"json">>, ?TEST_HOOK_EVENTS, true, State ),
+	{ ok, Hook }	= gh_hook:create_web( Owner, Repo, ?TEST_HOOK_URL, <<"json">>, ?TEST_HOOK_EVENTS, <<"SecretKey">>, true, State ),
 	true = maps:is_key( ping_url, Hook ),
 	
 	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
