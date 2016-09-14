@@ -1,3 +1,4 @@
 { gh_user, 			"github_user_name" }.
 { gh_repo,			"github_repository_name" }.
+{ gh_sha,           "repo_commit_sha" }.
 { gh_oauth_token,	"oauth_token" }.

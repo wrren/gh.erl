@@ -10,6 +10,6 @@ rel/example_project
 .rebar
 logs/
 .vscode/
-test/test.config
+config/test.config
 rebar.lock
 _build/
