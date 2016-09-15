@@ -33,11 +33,11 @@ list( Owner, Repository, State ) ->
 	gh_request:get( ["repos", Owner, Repository, "branches" ], State ).
 
 %% Get the branch name
-name( #{ name := Name } )						-> Name.
+name( #{ <<"name">>:= Name } )						-> Name.
 %% Get the latest commit SHA1
-commit_sha( #{ commit := #{ sha := Sha } } )	-> Sha.
+commit_sha( #{ <<"commit">> := #{ <<"sha">>:= Sha } } )	-> Sha.
 %% Get a link to detailes on the latest commit
-commit_url( #{ commit := #{ url := Url } } )	-> Url.
+commit_url( #{ <<"commit">> := #{ <<"url">> := Url } } )	-> Url.
 
 %%
 %%  Generate a map with a format matching that of a decoded branch JSON blob, useful for testing
@@ -45,5 +45,5 @@ commit_url( #{ commit := #{ url := Url } } )	-> Url.
 %%
 -spec make( binary(), binary(), binary() ) -> branch().
 make( Name, CommitSHA, CommitURL ) ->
-    #{  name 		=> Name,
-		commit 		=> #{ sha => CommitSHA, url => CommitURL } }.
+    #{  <<"name">> 		=> Name,
+		<<"commit">> 	=> #{ <<"sha">> => CommitSHA, <<"url">> => CommitURL } }.

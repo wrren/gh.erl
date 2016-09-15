@@ -26,7 +26,7 @@ by_sha( Repository, Sha, State ) ->
 %%
 %%	Get the SHA1 hash of this commit
 %%
-sha( #{ sha := Sha } ) -> Sha.
+sha( #{ <<"sha">> := Sha } ) -> Sha.
 
 
 %%
@@ -35,4 +35,4 @@ sha( #{ sha := Sha } ) -> Sha.
 %%
 -spec make( sha() ) -> commit().
 make( SHA ) ->
-    #{ sha => SHA }.
+    #{ <<"sha">> => SHA }.

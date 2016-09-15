@@ -18,7 +18,8 @@ tree_request( _Config ) ->
 	Token = ct:get_config( gh_oauth_token ),
 	State = gh:init( { oauth, Token } ),
 	{ ok, Tree } 	= gh_tree:get( ct:get_config( gh_user ), ct:get_config( gh_repo ), ct:get_config( gh_sha ), State ),
-	true = maps:is_key( sha, Tree ).
+	true = maps:is_key( <<"sha">>, Tree ),
+    true = maps:is_key( <<"tree">>, Tree ).
 	
 end_per_suite( Config ) ->
 	application:stop( ssl ),

@@ -25,7 +25,7 @@ repo_list_test( Config ) ->
 	{ ok, _RepositoryList } = gh_repo:list( State, [{ affiliation, [ "owner" ] } ] ),
 	{ ok, _OwnedList } = gh_repo:by_owner( ct:get_config( gh_user ), State ),
 	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
-	true = maps:is_key( name, Repository ),
+	true = maps:is_key( <<"name">>, Repository ),
 	NewConfig	= [{ repository, Repository } | Config ],
 	{ save_config, NewConfig }.
 		

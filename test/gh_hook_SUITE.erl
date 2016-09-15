@@ -28,7 +28,7 @@ create_test( _Config ) ->
 	State 	= gh:init( { oauth, Token } ),
 	
 	{ ok, Hook }	= gh_hook:create_web( Owner, Repo, ?TEST_HOOK_URL, <<"json">>, ?TEST_HOOK_EVENTS, <<"SecretKey">>, true, State ),
-	true = maps:is_key( ping_url, Hook ),
+	true = maps:is_key( <<"ping_url">>, Hook ),
 	
 	{ ok, Hooks }	= gh_hook:list( Owner, Repo, State ),
 	1 = length( lists:filter( fun( H ) -> gh_hook:config_url( H ) == ?TEST_HOOK_URL end, Hooks ) ),

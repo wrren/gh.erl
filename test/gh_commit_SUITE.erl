@@ -19,7 +19,7 @@ commit_list_test( _Config ) ->
 	State = gh:init( { oauth, Token } ),
 	{ ok, [ Repository | _ ] } 	= gh_repo:list( State ),
 	{ ok, [ Commit | _ ] }	 	= gh_commit:list( Repository, State ),
-	true = maps:is_key( sha, Commit ).
+	true = maps:is_key( <<"sha">>, Commit ).
 		
 end_per_suite( Config ) ->
 	application:stop( ssl ),

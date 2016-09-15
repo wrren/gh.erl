@@ -57,7 +57,7 @@ request( Method, Request, Url, Data ) ->
 			{ ok, no_content };
 		
 		{ ok, { { _Version, Status, _Reason }, Headers, Body } } when Status >= 200 andalso Status < 300 ->
-			JSONResponse = jsx:decode( Body, [ { labels, atom }, return_maps ] ),
+			JSONResponse = jsx:decode( Body, [ return_maps ] ),
 			case gh_pagination:next_page( Headers ) of
 				%% No pages left to retrieve
 				undefined ->
