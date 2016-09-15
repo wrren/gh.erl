@@ -2,7 +2,7 @@
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
 %% Query Functions
--export( [get/4, list/2, list/3, make/3] ).
+-export( [get/4, list/2, list/3, commits/4, make/3] ).
 %% Accessors
 -export( [name/1, commit_sha/1, commit_url/1] ).
 
@@ -31,6 +31,13 @@ list( Repository, State ) ->
 -spec list( gh_repo:owner(), gh_repo:name(), gh:state() ) -> { ok, [ branch() ] } | { error, term() }.
 list( Owner, Repository, State ) ->
 	gh_request:get( ["repos", Owner, Repository, "branches" ], State ).
+
+%%
+%%	@doc Get a list of all commits made under the given branch
+%%
+-spec commits( gh_repo:owner(), gh_repo:name(), name(), gh:state() ) -> { ok, [gh:commit()] } | { error, term() }.
+commits( Owner, Repository, Branch, State ) ->
+	gh_request:get( ["repos", Owner, Repository, "commits" ], [{ "sha", Branch }], State ).
 
 %% Get the branch name
 name( #{ <<"name">>:= Name } )						-> Name.
