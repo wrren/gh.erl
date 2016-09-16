@@ -7,7 +7,7 @@
 all() ->
 	[{ group, list_and_detail }].
 	
-groups() -> [{ list_and_detail, [sequence], [repo_list_test, repo_name_test] }].
+groups() -> [{ list_and_detail, [sequence], [repo_list_test, repo_name_test, languages_test] }].
 	
 init_per_suite( Config ) ->
 	application:start( inets ),
@@ -38,8 +38,15 @@ repo_name_test( Config ) ->
 	Name 			= gh_repo:name( Repo ),
 	{ ok, JSON }	= gh_repo:by_name( Owner, Name, State ),
 	_Admin 			= gh_repo:admin( Repo ),
-	Name 			= gh_repo:name( JSON ).	
+	Name 			= gh_repo:name( JSON ),
+	{ save_config, [{ repository, Repo } | Config ] }.
 		
+languages_test( Config ) ->
+	State 							= ?config( gh_state, Config ),
+	{ repo_name_test, NewConfig }	= ?config( saved_config, Config ),
+	Repo 							= ?config( repository, NewConfig ),
+	{ ok, _Languages }				= gh_repo:languages( gh_repo:owner( Repo ), gh_repo:name( Repo ), State ).
+
 end_per_suite( Config ) ->
 	application:stop( ssl ),
 	application:stop( public_key ),

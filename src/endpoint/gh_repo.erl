@@ -1,7 +1,7 @@
 -module( gh_repo ).
 -author( "Warren Kenny <warren.kenny@gmail.com>" ).
 
--export( [list/1, list/2, by_owner/2, by_name/3, by_organization/2] ).
+-export( [list/1, list/2, by_owner/2, by_name/3, by_organization/2, languages/3] ).
 -export( [id/1, make/7, owner/1, name/1, git_url/1, ssh_url/1, clone_url/1, private/1, admin/1, push/1, pull/1] ).
 
 -type owner()       :: binary().
@@ -60,7 +60,14 @@ by_name( Owner, Name, State ) ->
 -spec by_organization( string(), gh:state() ) -> { ok, [repository()] } | { error, term() }.
 by_organization( Organization, State ) ->
     gh_request:get( ["orgs", Organization, "repos"], State ).
-   
+
+%%
+%%  @doc List languages for the specified repository
+%%
+-spec languages( owner(), name(), gh:state() ) -> { ok, map() } | { error, term() }.
+languages( Owner, Repo, State ) ->
+    gh_request:get( ["repos", Owner, Repo, "languages"], State ).
+
 %% Repository ID
 id( #{ <<"id">> := ID } )                             -> ID.
 %% Repository Owner Name
