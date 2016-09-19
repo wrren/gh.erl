@@ -7,14 +7,14 @@
 -export( [name/1, commit_sha/1, commit_url/1] ).
 
 %% Type Exports
--type branch() 	:: map().
+-type branch() 	:: jsx:json_term().
 -type name() 	:: binary().
 -export_type( [branch/0, name/0] ).
 
 %%
 %%	@doc Get a single branch by name from the given repository
 %%
--spec get( gh_repo:owner(), gh_repo:name(), gh_branch:name(), gh:state() ) -> { ok, branch() } | { error, term() }.
+-spec get( gh_repo:owner(), gh_repo:name(), gh_branch:name(), gh:state() ) -> { error, term() } | { ok, branch() }.
 get( Owner, Repository, Branch, State ) ->
 	gh_request:get( ["repos", Owner, Repository, "branches", Branch ], State ).
 

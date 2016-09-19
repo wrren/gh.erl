@@ -3,7 +3,7 @@
 
 -export( [get/1] ).
 
--type user() :: map().
+-type user() :: jsx:json_term().
 
 -export_type( [user/0] ).
 

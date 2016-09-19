@@ -3,7 +3,7 @@
 
 -export( [by_user/1, by_user/2, by_name/2] ).
 
--type organization() :: map().
+-type organization() :: jsx:json_term().
 -export_type( [organization/0] ).
 
 %%

@@ -5,7 +5,7 @@
 -export( [make/1, list/2, by_sha/3, sha/1] ).
 
 %% Type Exports
--type commit() 		:: map().
+-type commit() 		:: jsx:json_term().
 -type sha()			:: binary().
 -export_type( [commit/0, sha/0] ).
 

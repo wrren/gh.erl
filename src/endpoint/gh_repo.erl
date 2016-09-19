@@ -6,8 +6,8 @@
 
 -type owner()       :: binary().
 -type name()        :: binary().
--type repository()  :: map().
--type branch()      :: map().
+-type repository()  :: jsx:json_term().
+-type branch()      :: gh_branch:branch().
 
 -export_type( [owner/0, name/0, repository/0, branch/0] ).
 

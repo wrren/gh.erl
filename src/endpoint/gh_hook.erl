@@ -19,7 +19,7 @@
 -type id() 		:: binary() | pos_integer().
 -type event() 	:: binary().
 -type name() 	:: binary().
--type hook() 	:: map().
+-type hook() 	:: jsx:json_term().
 -export_type( [id/0, hook/0, name/0, event/0] ).
 
 %% Accessors
