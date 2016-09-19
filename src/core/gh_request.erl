@@ -8,7 +8,8 @@
 -define( ACCEPT_JSON,			{ "Accept", "application/json" } ).
 
 -type request() 		:: httpc:request().
--type param() 			:: { string(), string() }.
+-type path() 			:: [any()].
+-type param() 			:: { string(), any() }.
 -type params() 			:: [param()].
 -type method() 			:: get | post | delete.
 -type content_type() 	:: string() | undefined.
@@ -19,11 +20,11 @@
 %%
 %%	Perform an authenticated GET request against the specified API endpoint with the given query parameters.
 %%
--spec get( [any()], list( { string(), string() } ), gh:state() ) -> response().
+-spec get( path(), params(), gh:state() ) -> response().
 get( Endpoint, Params, Handle ) ->
 	request( gh:base_url( Handle ), Endpoint, Params, get, undefined, undefined, gh:auth( Handle ) ).
 
--spec get( [any()], gh:state() ) -> response(); ( binary(), gh:state() ) -> response().
+-spec get( path(), gh:state() ) -> response(); ( binary(), gh:state() ) -> response().
 get( Url, Handle ) when is_binary( Url ) ->
 	request( get, { want:string( Url ), auth( gh:auth( Handle ), [] ) }, want:string( Url ) );
 
@@ -33,25 +34,25 @@ get( Endpoint, Handle ) ->
 %%
 %%	Perform an authenticated DELETE request against the specified API endpoint with the given query parameters.
 %%
--spec delete( [string()], [ { string(), string() } ], gh:state() ) -> response().
+-spec delete( path(), params(), gh:state() ) -> response().
 delete( Endpoint, Params, Handle ) ->
 	request( gh:base_url( Handle ), Endpoint, Params, delete, undefined, undefined, gh:auth( Handle ) ).
 
--spec delete( [string()], gh:state() ) -> { error, term() } | { ok, jsx:json_term() }.
+-spec delete( path(), gh:state() ) -> { error, term() } | { ok, jsx:json_term() }.
 delete( Endpoint, Handle ) ->
 	request( gh:base_url( Handle ), Endpoint, [], delete, undefined, undefined, gh:auth( Handle ) ).
 
 %%
 %%	Perform a POST request to the specified API endpoint with the given query parameters and data.
 %%
--spec post( [string()], [{ string(), string() }], term(), gh:state() ) -> response().
+-spec post( path(), params(), term(), gh:state() ) -> response().
 post( Endpoint, Params, Data, Handle ) ->
 	request( gh:base_url( Handle ), Endpoint, Params, post, jsx:encode( Data ), "application/json", gh:auth( Handle ) ).
 	
 %%
 %%	Perform an authenticated POST request to the specified API endpoint sending the given data.
 %%
--spec post( [string()], term(), gh:state() ) -> response().
+-spec post( path(), term(), gh:state() ) -> response().
 post( Endpoint, Data, Handle ) ->
     request( gh:base_url( Handle ), Endpoint, [], post, jsx:encode( Data ), "application/json", gh:auth( Handle ) ).
 
@@ -74,7 +75,7 @@ auth( { basic, Username, Password }, Headers ) ->
 %%
 %%	@doc Generate a URL by joining a base URL with the provided path and query parameters
 %%
--spec url( string() | binary(), [string()], [{ string(), string() }] ) -> string().
+-spec url( string() | binary(), path(), params() ) -> string().
 url( Url, Path, QueryParams ) when is_list( Url ) ->
 	Transform = fun( U, P, Q ) -> binary_to_list( iolist_to_binary( lists:droplast( lists:flatten( [ U, 
 							[ [ $/, Component ] || Component <- P ], 
@@ -117,7 +118,7 @@ request( Method, Request, Url, Data ) ->
 request( Method, Request, Url ) ->
 	request( Method, Request, Url, [] ).
 
--spec request( string(), [any()], params(), method(), term(), content_type(), gh:auth() ) -> { ok, term() } | { error, term() }.
+-spec request( string(), path(), params(), method(), term(), content_type(), gh:auth() ) -> { ok, term() } | { error, term() }.
 request( BaseUrl, Endpoint, Params, Method, Body, ContentType, Auth ) when 		Method =:= post 	orelse 
 																				Method =:= put 		orelse 
 																				Method =:= patch ->

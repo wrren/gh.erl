@@ -51,7 +51,7 @@ init( Auth ) ->
 %%
 %%  Initialize gh with the given authentication parameters and API base URL
 %%
--spec init( { atom(), string() }, string() ) -> #gh_state{}.
+-spec init( atom() | { atom(), string() }, string() ) -> #gh_state{}.
 init( Auth =  anonymous, BaseUrl ) ->
 	#gh_state{ base_url = BaseUrl, auth = Auth };
 
